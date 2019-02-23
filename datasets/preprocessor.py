@@ -37,6 +37,9 @@ def build_from_path(hparams, input_dirs, lf0_dir, mgc_dir, bap_dir, n_jobs=12, t
 			wav_file = basename 
 			wav_path = wav_file
 			basename = os.path.basename(basename)
+			file_name=basename
+			if int(file_name.split('-')[1].replace('.wav','')) >= 5655 and int(file_name.split('-')[1].replace('.wav',''))<=5674:
+				continue
 			futures.append(executor.submit(partial(_process_utterance, lf0_dir, mgc_dir, bap_dir, basename, wav_path, text, hparams)))
 			index += 1
 
