@@ -33,7 +33,7 @@ def build_from_path(hparams, input_dirs, lf0_dir, mgc_dir, bap_dir, n_jobs=12, t
 		lines = codecs.open(transcript, 'r', 'utf-8').readlines()
 		for line in lines:
 			fname,text = line.strip().split("==")
-            basename= os.path.join(input_dir, "wavs", fname.split('/')[1])
+			basename= os.path.join(input_dir, "wavs", fname.split('/')[1])
 			wav_file = basename 
 			wav_path = wav_file
 			basename = basename.split('/')[-1]
