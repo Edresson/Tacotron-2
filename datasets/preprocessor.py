@@ -36,9 +36,10 @@ def build_from_path(hparams, input_dirs, lf0_dir, mgc_dir, bap_dir, n_jobs=12, t
 			basename= os.path.join(input_dir, "wavs", fname.split('/')[1])
 			wav_file = basename 
 			wav_path = wav_file
-			basename = basename.split('/')[-1]
+			basename = os.path.basename(basename)
 			futures.append(executor.submit(partial(_process_utterance, lf0_dir, mgc_dir, bap_dir, basename, wav_path, text, hparams)))
 			index += 1
+
 
 	return [future.result() for future in tqdm(futures) if future.result() is not None]
 
