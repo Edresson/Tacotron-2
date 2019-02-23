@@ -3,6 +3,7 @@ from concurrent.futures import ProcessPoolExecutor
 from functools import partial
 import numpy as np
 from datasets import audio
+import codecs
 
 
 def build_from_path(hparams, input_dirs, lf0_dir, mgc_dir, bap_dir, n_jobs=12, tqdm=lambda x: x):
@@ -28,11 +29,13 @@ def build_from_path(hparams, input_dirs, lf0_dir, mgc_dir, bap_dir, n_jobs=12, t
 	futures = []
 	index = 1
 	for input_dir in input_dirs:
-		trn_files = glob.glob(os.path.join(input_dir, 'biaobei_48000', '*.trn'))
-		for trn in trn_files:
+		transcript = os.path.join(input_dir, 'texts.csv')
+        lines = codecs.open(transcript, 'r', 'utf-8').readlines()
+		for line in lines:
 			with open(trn) as f:
-				basename = trn[:-4]
-				wav_file = basename + '.wav'
+				fname,text = line.strip().split("==")
+                basename= os.path.join(input_dir, "wavs", fname.split('/')[1])
+				wav_file = basename 
 				wav_path = wav_file
 				basename = basename.split('/')[-1]
 				text = f.readline().strip()

@@ -44,7 +44,9 @@ def norm_data(args):
 
 	if args.dataset.startswith('THCHS-30'):
 		return [os.path.join(args.base_dir, 'data_thchs30')]
-
+	if args.dataset.startswith('TTS-Portuguese'):
+		return [os.path.join(args.base_dir, 'TTS-Portuguese')]
+	
 	if args.dataset == 'M-AILABS':
 		supported_languages = ['en_US', 'en_UK', 'fr_FR', 'it_IT', 'de_DE', 'es_ES', 'ru_RU',
 			'uk_UK', 'pl_PL', 'nl_NL', 'pt_PT', 'fi_FI', 'se_SE', 'tr_TR', 'ar_SA']
@@ -89,9 +91,9 @@ def main():
 	parser.add_argument('--base_dir', default='')
 	parser.add_argument('--hparams', default='',
 		help='Hyperparameter overrides as a comma-separated list of name=value pairs')
-	parser.add_argument('--dataset', default='THCHS-30')
+	parser.add_argument('--dataset', default='TTS-Portuguese')
 	parser.add_argument('--language', default='en_US')
-	parser.add_argument('--voice', default='female')
+	parser.add_argument('--voice', default='male')
 	parser.add_argument('--reader', default='mary_ann')
 	parser.add_argument('--merge_books', default='False')
 	parser.add_argument('--book', default='northandsouth')
