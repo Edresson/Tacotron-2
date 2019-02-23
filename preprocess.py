@@ -45,7 +45,7 @@ def norm_data(args):
 	if args.dataset.startswith('THCHS-30'):
 		return [os.path.join(args.base_dir, 'data_thchs30')]
 	if args.dataset.startswith('TTS-Portuguese'):
-		return [os.path.join(args.base_dir, 'TTS-Portuguese')]
+		return [os.path.join('..',args.base_dir, 'TTS-Portuguese')]
 	
 	if args.dataset == 'M-AILABS':
 		supported_languages = ['en_US', 'en_UK', 'fr_FR', 'it_IT', 'de_DE', 'es_ES', 'ru_RU',
