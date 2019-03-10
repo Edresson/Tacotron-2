@@ -47,31 +47,33 @@ class Synthesizer:
 		hparams = self._hparams
 		cleaner_names = [x.strip() for x in hparams.cleaners.split(',')]
 		seqs = [np.asarray(text_to_sequence(text, cleaner_names), dtype=np.int32) for text in texts]
-		input_lengths = [len(seq) for seq in seqs]
+		
+
 		seqs = self._prepare_inputs(seqs)
+		input_lengths = [len(seq) for seq in seqs]
 		feed_dict = {
 			self.model.inputs: seqs,
 			self.model.input_lengths: np.asarray(input_lengths, dtype=np.int32),
 		}
 
 		lf0s, mgcs, baps, alignments = self.session.run([self.lf0_outputs, self.mgc_outputs, self.bap_outputs, self.alignments], feed_dict=feed_dict)
-		print('lf0s len: ',len(lf0s))
+		print('lf0s len:',len(lf0s))
 		for i, _ in enumerate(lf0s):
 			# Write the predicted features to disk
 			# Note: outputs files and target ones have same names, just different folders
-			np.save(os.path.join(out_dir, 'lf0-{:03d}.npy'.format(basenames[i])), lf0s[i], allow_pickle=False)
-			np.save(os.path.join(out_dir, 'mgc-{:03d}.npy'.format(basenames[i])), mgcs[i], allow_pickle=False)
-			np.save(os.path.join(out_dir, 'bap-{:03d}.npy'.format(basenames[i])), baps[i], allow_pickle=False)
+			np.save(os.path.join(out_dir, 'lf0-{:03d}.npy'.format(i)), lf0s[i], allow_pickle=False)
+			np.save(os.path.join(out_dir, 'mgc-{:03d}.npy'.format(i)), mgcs[i], allow_pickle=False)
+			np.save(os.path.join(out_dir, 'bap-{:03d}.npy'.format(i)), baps[i], allow_pickle=False)
 
 			if log_dir is not None:
 				#save alignments
-				plot.plot_alignment(alignments[i], os.path.join(log_dir, 'plots/alignment-{:03d}.png'.format(basenames[i])),
+				plot.plot_alignment(alignments[i], os.path.join(log_dir, 'plots/alignment-{:03d}.png'.format(i)),
 					info='{}'.format(texts[i]), split_title=True)
 
 				#save wav
-				print("text decoded: ",sequence_to_text(seqs[i]), ' text: ',texts[i],' wav:  ', 'wavs/wav-{:03d}.wav'.format(basenames[i]))
+				print("text decoded: ",sequence_to_text(seqs[i]), ' text: ',texts[i],' wav:  ', 'wavs/wav-{:03d}.wav'.format(i))
 				wav = audio.synthesize(lf0s[i], mgcs[i], baps[i], hparams)
-				audio.save_wav(wav, os.path.join(log_dir, 'wavs/wav-{:03d}.wav'.format(basenames[i])), hparams)
+				audio.save_wav(wav, os.path.join(log_dir, 'wavs/wav-{:03d}.wav'.format(i)), hparams)
 
 
 	def eval(self, text):
