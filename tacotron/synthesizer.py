@@ -10,8 +10,8 @@ from infolog import log
 from librosa import effects
 from tacotron.models import create_model
 from tacotron.utils import plot
+from tacotron.utils.text import text_to_sequence
 from tacotron.utils.text import sequence_to_text
-
 
 class Synthesizer:
 	def load(self, checkpoint_path, hparams, gta=False, model_name='Tacotron'):
