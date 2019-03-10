@@ -9,7 +9,6 @@ from hparams import hparams, hparams_debug_string
 from infolog import log
 from tacotron.synthesizer import Synthesizer
 from tqdm import tqdm
-from tacotron.text import sequence_to_text
 
 def generate_fast(model, text):
 	model.synthesize(text, None, None, None, None)
