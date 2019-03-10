@@ -65,7 +65,7 @@ class Synthesizer:
 
 			if log_dir is not None:
 				#save alignments
-				plot.plot_alignment(alignments[i], os.path.join(log_dir, 'plots/alignment-{:03d}.png'.format(basenames[i])),
+				plot.plot_alignment(alignments[i], os.path.join(log_dir, 'plots/alignment-{:03d}.png'.format(i)),
 					info='{}'.format(texts[i]), split_title=True)
 
 				#save wav
