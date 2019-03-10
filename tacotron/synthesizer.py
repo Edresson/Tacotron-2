@@ -59,9 +59,9 @@ class Synthesizer:
 		for i, _ in enumerate(lf0s):
 			# Write the predicted features to disk
 			# Note: outputs files and target ones have same names, just different folders
-			np.save(os.path.join(out_dir, 'lf0-{:03d}.npy'.format(basenames[i])), lf0s[i], allow_pickle=False)
-			np.save(os.path.join(out_dir, 'mgc-{:03d}.npy'.format(basenames[i])), mgcs[i], allow_pickle=False)
-			np.save(os.path.join(out_dir, 'bap-{:03d}.npy'.format(basenames[i])), baps[i], allow_pickle=False)
+			np.save(os.path.join(out_dir, 'lf0-{:03d}.npy'.format(i)), lf0s[i], allow_pickle=False)
+			np.save(os.path.join(out_dir, 'mgc-{:03d}.npy'.format(i)), mgcs[i], allow_pickle=False)
+			np.save(os.path.join(out_dir, 'bap-{:03d}.npy'.format(i)), baps[i], allow_pickle=False)
 
 			if log_dir is not None:
 				#save alignments
@@ -70,7 +70,7 @@ class Synthesizer:
 
 				#save wav
 				wav = audio.synthesize(lf0s[i], mgcs[i], baps[i], hparams)
-				audio.save_wav(wav, os.path.join(log_dir, 'wavs/wav-{:03d}.wav'.format(basenames[i])), hparams)
+				audio.save_wav(wav, os.path.join(log_dir, 'wavs/wav-{:03d}.wav'.format(i)), hparams)
 
 
 	def eval(self, text):
