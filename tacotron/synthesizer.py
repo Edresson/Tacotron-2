@@ -46,7 +46,7 @@ class Synthesizer:
 	def synthesize(self, texts, basenames, out_dir, log_dir):
 		hparams = self._hparams
 		cleaner_names = [x.strip() for x in hparams.cleaners.split(',')]
-		seqs = [np.asarray(text_to_sequence(text, cleaner_names)) for text in texts]
+		seqs = [np.asarray(text_to_sequence(text, cleaner_names), dtype=np.int32) for text in texts]
 		input_lengths = [len(seq) for seq in seqs]
 		seqs = self._prepare_inputs(seqs)
 		feed_dict = {

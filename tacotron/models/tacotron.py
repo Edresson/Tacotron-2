@@ -80,7 +80,7 @@ class Tacotron():
 			decoder_lstm = DecoderRNN(is_training, layers=hp.decoder_layers,
 				size=hp.decoder_lstm_units, zoneout=hp.tacotron_zoneout_rate, scope='decoder_lstm')
 			#Frames Projection layer
-			frame_projection = FrameProjection(target_depth * hp.outputs_per_step, scope='mgc_transform')
+			fframe_projectionrame_projection = FrameProjection(target_depth * hp.outputs_per_step, scope='mgc_transform')
 			#<stop_token> projection layer
 			stop_projection = StopProjection(is_training or is_evaluating, shape=hp.outputs_per_step, scope='stop_token_projection')
 
