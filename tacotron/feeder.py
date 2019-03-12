@@ -46,7 +46,7 @@ class Feeder:
 		self._train_meta = list(np.array(self._metadata))
 		self._test_meta = list(np.array(self._test_metadata))
 
-		if hparams.test_steps None: 
+		if hparams.test_steps is None: 
                         self.test_steps = len(self._test_meta) // hparams.tacotron_batch_size
                 else:
                         self.test_steps = hparams.test_steps
