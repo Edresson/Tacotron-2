@@ -20,7 +20,7 @@ class Synthesizer:
 		input_lengths = tf.placeholder(tf.int32, [None], 'input_lengths')
 		with tf.variable_scope('model') as scope:
 			self.model = create_model(model_name, hparams)
-			self.model.initialize(inputs, input_lengths)
+			self.model.initialize(inputs, input_lengths,is_training=False, is_evaluating=True)
 			self.alignments = self.model.alignments
 			self.lf0_outputs = self.model.lf0_outputs
 			self.mgc_outputs = self.model.mgc_outputs
