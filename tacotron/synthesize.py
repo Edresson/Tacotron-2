@@ -52,7 +52,7 @@ def run_eval(args, checkpoint_path, output_dir, hparams, sentences):
 	synth = Synthesizer()
 	synth.load(checkpoint_path, hparams)
         #Set inputs batch wise
-	sentences = [sentences[i: i+hparams.tacotron_synthesis_batch_size] for i in range(0, len(sentences), hparams.tacotron_synthesis_batch_size)]
+	#sentences = [sentences[i: i+hparams.tacotron_synthesis_batch_size] for i in range(0, len(sentences), hparams.tacotron_synthesis_batch_size)]
 	
 	with open(os.path.join(eval_dir, 'map.txt'), 'w') as file:
 		for i, text in enumerate(tqdm(sentences)):
