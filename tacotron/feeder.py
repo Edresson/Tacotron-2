@@ -33,24 +33,18 @@ class Feeder:
 			hours = sum([int(x[4]) for x in self._metadata]) * 5 / (3600)
 			log('Loaded metadata for {} examples ({:.2f} hours)'.format(len(self._metadata), hours))
 
-		#Train test split
+		#Test split dataset
+		test_metadata_filename=os.path.join(os.path.dirname(metadata_filename),'test.txt')
+		with open(test_metadata_filename, encoding='utf-8') as f:
+			self._test_metadata = [line.strip().split('|') for line in f]
+			hours = sum([int(x[4]) for x in self._metadata]) * 5 / (3600)
+			log('Loaded test metadata for {} examples ({:.2f} hours)'.format(len(self._metadata), hours))
+			
 		if hparams.tacotron_test_size is None:
 			assert hparams.tacotron_test_batches is not None
 
-		test_size = (hparams.tacotron_test_size if hparams.tacotron_test_size is not None
-			else hparams.tacotron_test_batches * hparams.tacotron_batch_size)
-		indices = np.arange(len(self._metadata))
-		train_indices, test_indices = train_test_split(indices,
-			test_size=test_size, random_state=hparams.tacotron_data_random_state)
-
-		#Make sure test_indices is a multiple of batch_size else round up
-		len_test_indices = self._round_down(len(test_indices), hparams.tacotron_batch_size)
-		extra_test = test_indices[len_test_indices:]
-		test_indices = test_indices[:len_test_indices]
-		train_indices = np.concatenate([train_indices, extra_test])
-
-		self._train_meta = list(np.array(self._metadata)[train_indices])
-		self._test_meta = list(np.array(self._metadata)[test_indices])
+		self._train_meta = list(np.array(self._metadata))
+		self._test_meta = list(np.array(self._test_metadata))
 
 		self.test_steps = len(self._test_meta) // hparams.tacotron_batch_size
 
