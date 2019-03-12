@@ -53,8 +53,8 @@ class Synthesizer:
 			self.model.inputs: seqs,
 			self.model.input_lengths: np.asarray(input_lengths, dtype=np.int32),
 		}
-
-		lf0s, mgcs, baps, alignments = self.session.run([self.lf0_outputs, self.mgc_outputs, self.bap_outputs, self.alignments], feed_dict=feed_dict)
+                with tf.device('/cpu:0'):                        
+                        lf0s, mgcs, baps, alignments = self.session.run([self.lf0_outputs, self.mgc_outputs, self.bap_outputs, self.alignments], feed_dict=feed_dict)
 
 		for i, _ in enumerate(lf0s):
 			# Write the predicted features to disk
