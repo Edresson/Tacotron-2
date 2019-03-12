@@ -105,7 +105,7 @@ def run_preprocess(args, hparams):
 	input_folders = norm_data(args)
 	output_folder = os.path.join(args.base_dir, args.output)
 
-	preprocess(args, input_folders, output_folder, hparams)
+	#preprocess(args, input_folders, output_folder, hparams)
 	preprocess_test(args, input_folders, output_folder, hparams)
 
 def main():
