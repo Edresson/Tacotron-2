@@ -192,6 +192,10 @@ def train(log_dir, args, hparams):
 						before_losses.append(before_loss)
 						after_losses.append(after_loss)
 						stop_token_losses.append(stop_token_loss)
+						#Save some log to monitor model improvement on same unseen sequence
+                                                wav = audio.synthesize(lf0_pred, mgc_pred, bap_pred, hparams)
+                                                audio.save_wav(wav, os.path.join(eval_wav_dir, 'step-{}-eval-waveform-{}.wav'.format(step,i)), hparams)
+					
 
 					eval_loss = sum(eval_losses) / len(eval_losses)
 					before_loss = sum(before_losses) / len(before_losses)
@@ -199,9 +203,7 @@ def train(log_dir, args, hparams):
 					stop_token_loss = sum(stop_token_losses) / len(stop_token_losses)
 
 					log('Saving eval log to {}..'.format(eval_dir))
-					#Save some log to monitor model improvement on same unseen sequence
-					wav = audio.synthesize(lf0_pred, mgc_pred, bap_pred, hparams)
-					audio.save_wav(wav, os.path.join(eval_wav_dir, 'step-{}-eval-waveform.wav'.format(step)), hparams)
+					
 
 					plot.plot_alignment(align, os.path.join(eval_plot_dir, 'step-{}-eval-align.png'.format(step)),
 						info='{}, {}, step={}, loss={:.5f}'.format(args.model, time_string(), step, eval_loss),

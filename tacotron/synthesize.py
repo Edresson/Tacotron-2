@@ -57,9 +57,9 @@ def run_eval(args, checkpoint_path, output_dir, hparams, sentences):
 	with open(os.path.join(eval_dir, 'map.txt'), 'w') as file:
 		for i, text in enumerate(tqdm(sentences)):
 			start = time.time()
-			wav= synth.eval(text)
-			a=audio.save_wav(wav, os.path.join(log_dir, 'wavs/eval-test.wav'), hparams)
-			#synth.synthesize([text], [i+1], eval_dir, log_dir)
+			#wav= synth.eval(text)
+			#a=audio.save_wav(wav, os.path.join(log_dir, 'wavs/eval-test.wav'), hparams)
+			synth.synthesize([text], [i+1], eval_dir, log_dir)
 	return eval_dir
 
 
