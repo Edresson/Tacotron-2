@@ -74,7 +74,7 @@ hparams = tf.contrib.training.HParams(
 	tacotron_test_size = 100, #% of data to keep as test data, if None, tacotron_test_batches must be not None
 	tacotron_test_batches = 50, #number of test batches (For Ljspeech: 10% ~= 41 batches of 32 samples)
 	tacotron_data_random_state=1234, #random state for train test split repeatability
-
+        test_steps = 21
 	#Usually your GPU can handle 16x tacotron_batch_size during synthesis for the same memory amount during training (because no gradients to keep and ops to register for backprop)
 	tacotron_synthesis_batch_size = 2 * 16, #This ensures GTA synthesis goes up to 40x faster than one sample at a time and uses 100% of your GPU computation power.
 
