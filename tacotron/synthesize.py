@@ -10,6 +10,7 @@ from infolog import log
 from tacotron.synthesizer import Synthesizer
 from tqdm import tqdm
 
+from datasets import audio
 
 def generate_fast(model, text):
 	model.synthesize(text, None, None, None, None)
