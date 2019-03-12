@@ -72,14 +72,13 @@ def build_from_path_test(hparams, input_dirs, lf0_dir, mgc_dir, bap_dir, n_jobs=
 		transcript = os.path.join(input_dir, 'texts.csv')
 		lines = codecs.open(transcript, 'r', 'utf-8').readlines()
 		for line in lines:
+			fname,text = line.strip().split("==")
+			basename= os.path.join(input_dir, "wavs", fname.split('/')[1])
+			wav_file = basename 
+			wav_path = wav_file
+			basename = os.path.basename(basename)
+			file_name=basename
 			if int(file_name.split('-')[1].replace('.wav','')) >= 5655 and int(file_name.split('-')[1].replace('.wav',''))<=5674:
-				fname,text = line.strip().split("==")
-				basename= os.path.join(input_dir, "wavs", fname.split('/')[1])
-				wav_file = basename 
-				wav_path = wav_file
-				basename = os.path.basename(basename)
-				file_name=basename
-				
 				futures.append(executor.submit(partial(_process_utterance, lf0_dir, mgc_dir, bap_dir, basename, wav_path, text, hparams)))
 				index += 1
 			else:
