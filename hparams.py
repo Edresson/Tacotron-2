@@ -72,7 +72,7 @@ hparams = tf.contrib.training.HParams(
 	tacotron_scale_regularization = True, #Whether to rescale regularization weight to adapt for outputs range (used when reg_weight is high and biasing the model)
 
 	tacotron_test_size = 100, #% of data to keep as test data, if None, tacotron_test_batches must be not None
-	tacotron_test_batches = 20, #number of test batches (For Ljspeech: 10% ~= 41 batches of 32 samples)
+	tacotron_test_batches = 50, #number of test batches (For Ljspeech: 10% ~= 41 batches of 32 samples)
 	tacotron_data_random_state=1234, #random state for train test split repeatability
 
 	#Usually your GPU can handle 16x tacotron_batch_size during synthesis for the same memory amount during training (because no gradients to keep and ops to register for backprop)
