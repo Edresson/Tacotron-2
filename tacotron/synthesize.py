@@ -51,12 +51,14 @@ def run_eval(args, checkpoint_path, output_dir, hparams, sentences):
 	log(hparams_debug_string())
 	synth = Synthesizer()
 	synth.load(checkpoint_path, hparams)
-
+        #Set inputs batch wise
+	sentences = [sentences[i: i+hparams.tacotron_synthesis_batch_size] for i in range(0, len(sentences), hparams.tacotron_synthesis_batch_size)]
+	
 	with open(os.path.join(eval_dir, 'map.txt'), 'w') as file:
-		'''for i, text in enumerate(tqdm(sentences)):
+		for i, text in enumerate(tqdm(sentences)):
 			start = time.time()
-			synth.synthesize([text], [i+1], eval_dir, log_dir)'''
-		synth.synthesize(sentences, [1], eval_dir, log_dir)
+			synth.synthesize([text], [i+1], eval_dir, log_dir)
+		#synth.synthesize(sentences, [1], eval_dir, log_dir)
 	return eval_dir
 
 
