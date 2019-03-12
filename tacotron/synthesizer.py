@@ -11,7 +11,7 @@ from librosa import effects
 from tacotron.models import create_model
 from tacotron.utils import plot
 from tacotron.utils.text import text_to_sequence
-from tacotron.utils.text import sequence_to_text
+
 
 class Synthesizer:
 	def load(self, checkpoint_path, hparams, gta=False, model_name='Tacotron'):
@@ -46,17 +46,16 @@ class Synthesizer:
 	def synthesize(self, texts, basenames, out_dir, log_dir):
 		hparams = self._hparams
 		cleaner_names = [x.strip() for x in hparams.cleaners.split(',')]
-		seqs = [np.asarray(text_to_sequence(text, cleaner_names), dtype=np.int32) for text in texts]
+		seqs = [np.asarray(text_to_sequence(text, cleaner_names)) for text in texts]
 		input_lengths = [len(seq) for seq in seqs]
 		seqs = self._prepare_inputs(seqs)
-		
 		feed_dict = {
 			self.model.inputs: seqs,
 			self.model.input_lengths: np.asarray(input_lengths, dtype=np.int32),
 		}
 
 		lf0s, mgcs, baps, alignments = self.session.run([self.lf0_outputs, self.mgc_outputs, self.bap_outputs, self.alignments], feed_dict=feed_dict)
-		print('lf0s len:',len(lf0s))
+
 		for i, _ in enumerate(lf0s):
 			# Write the predicted features to disk
 			# Note: outputs files and target ones have same names, just different folders
@@ -70,7 +69,6 @@ class Synthesizer:
 					info='{}'.format(texts[i]), split_title=True)
 
 				#save wav
-				print("text decoded: ",sequence_to_text(seqs[i]), ' text: ',texts[i],' wav:  ', 'wavs/wav-{:03d}.wav'.format(basenames[i]))
 				wav = audio.synthesize(lf0s[i], mgcs[i], baps[i], hparams)
 				audio.save_wav(wav, os.path.join(log_dir, 'wavs/wav-{:03d}.wav'.format(basenames[i])), hparams)
 
