@@ -193,8 +193,8 @@ def train(log_dir, args, hparams):
 						after_losses.append(after_loss)
 						stop_token_losses.append(stop_token_loss)
 						#Save some log to monitor model improvement on same unseen sequence
-                                                wav = audio.synthesize(lf0_pred, mgc_pred, bap_pred, hparams)
-                                                audio.save_wav(wav, os.path.join(eval_wav_dir, 'step-{}-eval-waveform-{}.wav'.format(step,i)), hparams)
+						wav = audio.synthesize(lf0_pred, mgc_pred, bap_pred, hparams)
+						audio.save_wav(wav, os.path.join(eval_wav_dir, 'step-{}-eval-waveform-{}.wav'.format(step,i)), hparams)
 					
 
 					eval_loss = sum(eval_losses) / len(eval_losses)
