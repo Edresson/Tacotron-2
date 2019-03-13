@@ -7,7 +7,7 @@ from datasets import audio
 from wavenet_vocoder.util import is_mulaw, is_mulaw_quantize, mulaw, mulaw_quantize
 
 
-def build_from_path(hparams, input_dirs, mel_dir, linear_dir, wav_dir, n_jobs=12, tqdm=lambda x: x):
+def build_from_path(hparams, input_dir, mel_dir, wav_dir, n_jobs=12, tqdm=lambda x: x):
 	"""
 	Preprocesses the speech dataset from a gven input path to given output directories
 
@@ -28,21 +28,15 @@ def build_from_path(hparams, input_dirs, mel_dir, linear_dir, wav_dir, n_jobs=12
 	# optimization purposes and it can be omited
 	executor = ProcessPoolExecutor(max_workers=n_jobs)
 	futures = []
-	index = 1
-	for input_dir in input_dirs:
-		with open(os.path.join(input_dir, 'metadata.csv'), encoding='utf-8') as f:
-			for line in f:
-				parts = line.strip().split('|')
-				basename = parts[0]
-				wav_path = os.path.join(input_dir, 'wavs', '{}.wav'.format(basename))
-				text = parts[2]
-				futures.append(executor.submit(partial(_process_utterance, mel_dir, linear_dir, wav_dir, basename, wav_path, text, hparams)))
-				index += 1
+	for file in os.listdir(input_dir):
+		wav_path = os.path.join(input_dir, file)
+		basename = os.path.basename(wav_path).replace('.wav', '')
+		futures.append(executor.submit(partial(_process_utterance, mel_dir, wav_dir, basename, wav_path, hparams)))
 
 	return [future.result() for future in tqdm(futures) if future.result() is not None]
 
 
-def _process_utterance(mel_dir, linear_dir, wav_dir, index, wav_path, text, hparams):
+def _process_utterance(mel_dir, wav_dir, index, wav_path, hparams):
 	"""
 	Preprocesses a single utterance wav/text pair
 
@@ -53,7 +47,7 @@ def _process_utterance(mel_dir, linear_dir, wav_dir, index, wav_path, text, hpar
 		- mel_dir: the directory to write the mel spectograms into
 		- linear_dir: the directory to write the linear spectrograms into
 		- wav_dir: the directory to write the preprocessed wav into
-		- index: the numeric index to use in the spectogram filename
+		- index: the numeric index to use in the spectrogram filename
 		- wav_path: path to the audio file containing the speech input
 		- text: text spoken in the input audio file
 		- hparams: hyper parameters
@@ -69,7 +63,7 @@ def _process_utterance(mel_dir, linear_dir, wav_dir, index, wav_path, text, hpar
 			wav_path))
 		return None
 
-	#Trim lead/trail silences
+	#M-AILABS extra silence specific
 	if hparams.trim_silence:
 		wav = audio.trim_silence(wav, hparams)
 
@@ -120,13 +114,6 @@ def _process_utterance(mel_dir, linear_dir, wav_dir, index, wav_path, text, hpar
 	if mel_frames > hparams.max_mel_frames and hparams.clip_mels_length:
 		return None
 
-	#Compute the linear scale spectrogram from the wav
-	linear_spectrogram = audio.linearspectrogram(preem_wav, hparams).astype(np.float32)
-	linear_frames = linear_spectrogram.shape[1]
-
-	#sanity check
-	assert linear_frames == mel_frames
-
 	if hparams.use_lws:
 		#Ensure time resolution adjustement between audio and mel-spectrogram
 		fft_size = hparams.n_fft if hparams.win_size is None else hparams.win_size
@@ -136,9 +123,9 @@ def _process_utterance(mel_dir, linear_dir, wav_dir, index, wav_path, text, hpar
 		out = np.pad(out, (l, r), mode='constant', constant_values=constant_values)
 	else:
 		#Ensure time resolution adjustement between audio and mel-spectrogram
-		l_pad, r_pad = audio.librosa_pad_lr(wav, hparams.n_fft, audio.get_hop_size(hparams), hparams.wavenet_pad_sides)
+		l_pad, r_pad = audio.librosa_pad_lr(wav, hparams.n_fft, audio.get_hop_size(hparams))
 
-		#Reflect pad audio signal on the right (Just like it's done in Librosa to avoid frame inconsistency)
+		#Reflect pad audio signal (Just like it's done in Librosa to avoid frame inconsistency)
 		out = np.pad(out, (l_pad, r_pad), mode='constant', constant_values=constant_values)
 
 	assert len(out) >= mel_frames * audio.get_hop_size(hparams)
@@ -151,12 +138,17 @@ def _process_utterance(mel_dir, linear_dir, wav_dir, index, wav_path, text, hpar
 	time_steps = len(out)
 
 	# Write the spectrogram and audio to disk
-	audio_filename = 'audio-{}.npy'.format(index)
-	mel_filename = 'mel-{}.npy'.format(index)
-	linear_filename = 'linear-{}.npy'.format(index)
-	np.save(os.path.join(wav_dir, audio_filename), out.astype(out_dtype), allow_pickle=False)
-	np.save(os.path.join(mel_dir, mel_filename), mel_spectrogram.T, allow_pickle=False)
-	np.save(os.path.join(linear_dir, linear_filename), linear_spectrogram.T, allow_pickle=False)
+	audio_filename = os.path.join(wav_dir, 'audio-{}.npy'.format(index))
+	mel_filename = os.path.join(mel_dir, 'mel-{}.npy'.format(index))
+	np.save(audio_filename, out.astype(out_dtype), allow_pickle=False)
+	np.save(mel_filename, mel_spectrogram.T, allow_pickle=False)
+
+	#global condition features
+	if hparams.gin_channels > 0:
+		raise RuntimeError('When activating global conditions, please set your speaker_id rules in line 129 of datasets/wavenet_preprocessor.py to use them during training')
+		speaker_id = '<no_g>' #put the rule to determine how to assign speaker ids (using file names maybe? file basenames are available in "index" variable)
+	else:
+		speaker_id = '<no_g>'
 
 	# Return a tuple describing this training example
-	return (audio_filename, mel_filename, linear_filename, time_steps, mel_frames, text)
+	return (audio_filename, mel_filename, mel_filename, speaker_id, time_steps, mel_frames)
