@@ -73,7 +73,7 @@ def linearspectrogram(wav, hparams):
     mag = 20 * np.log10(np.maximum(1e-5, mag))
 
     # normalize
-    mag = np.clip((mag - hp.ref_db + hp.max_db) / hp.max_db, 1e-8, 1)
+    mag = np.clip((mag - hparams.ref_db + hparams.max_db) / hparams.max_db, 1e-8, 1)
 
     # Transpose
     mag = mag.T.astype(np.float32)  # (T, 1+n_fft//2)
