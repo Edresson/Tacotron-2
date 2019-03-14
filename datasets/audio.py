@@ -167,7 +167,7 @@ def inv_mel_spectrogram_tensorflow(mel_spectrogram, hparams):
 
 def _lws_processor(hparams):
 	import lws
-	return lws.lws(hparams.n_fft, get_hop_size(hparams), fftsize=hparams.win_size, mode="speech")
+	return lws.lws(hparams.n_fft, get_hop_size(hparams), fftsize=hparams.win_length, mode="speech")
 
 def _griffin_lim(S, hparams):
 	'''librosa implementation of Griffin-Lim
@@ -189,21 +189,21 @@ def _griffin_lim_tensorflow(S, hparams):
 		# TensorFlow's stft and istft operate on a batch of spectrograms; create batch of size 1
 		S = tf.expand_dims(S, 0)
 		S_complex = tf.identity(tf.cast(S, dtype=tf.complex64))
-		y = tf.contrib.signal.inverse_stft(S_complex, hparams.win_size, get_hop_size(hparams), hparams.n_fft)
+		y = tf.contrib.signal.inverse_stft(S_complex, hparams.win_length, get_hop_size(hparams), hparams.n_fft)
 		for i in range(hparams.griffin_lim_iters):
-			est = tf.contrib.signal.stft(y, hparams.win_size, get_hop_size(hparams), hparams.n_fft)
+			est = tf.contrib.signal.stft(y, hparams.win_length, get_hop_size(hparams), hparams.n_fft)
 			angles = est / tf.cast(tf.maximum(1e-8, tf.abs(est)), tf.complex64)
-			y = tf.contrib.signal.inverse_stft(S_complex * angles, hparams.win_size, get_hop_size(hparams), hparams.n_fft)
+			y = tf.contrib.signal.inverse_stft(S_complex * angles, hparams.win_length, get_hop_size(hparams), hparams.n_fft)
 	return tf.squeeze(y, 0)
 
 def _stft(y, hparams):
 	if hparams.use_lws:
 		return _lws_processor(hparams).stft(y).T
 	else:
-		return librosa.stft(y=y, n_fft=hparams.n_fft, hop_length=get_hop_size(hparams), win_length=hparams.win_size, pad_mode='constant')
+		return librosa.stft(y=y, n_fft=hparams.n_fft, hop_length=get_hop_size(hparams), win_length=hparams.win_length, pad_mode='constant')
 
 def _istft(y, hparams):
-	return librosa.istft(y, hop_length=get_hop_size(hparams), win_length=hparams.win_size)
+	return librosa.istft(y, hop_length=get_hop_size(hparams), win_length=hparams.win_length)
 
 ##########################################################
 #Those are only correct when using lws!!! (This was messing with Wavenet quality for a long time!)
