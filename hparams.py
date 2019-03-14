@@ -348,30 +348,27 @@ hparams = tf.contrib.training.HParams(
 	#Eval/Debug parameters
 	#Eval sentences (if no eval text file was specified during synthesis, these sentences are used for eval)
 	sentences = [
-	# From July 8, 2017 New York Times:
-	'Scientists at the CERN laboratory say they have discovered a new particle.',
-	'There\'s a way to measure the acute emotional intelligence that has never gone out of style.',
-	'President Trump met with other leaders at the Group of 20 conference.',
-	'The Senate\'s bill to repeal and replace the Affordable Care Act is now imperiled.',
-	# From Google's Tacotron example page:
-	'Generative adversarial network or variational auto-encoder.',
-	'Basilar membrane and otolaryngology are not auto-correlations.',
-	'He has read the whole thing.',
-	'He reads books.',
-	'He thought it was time to present the present.',
-	'Thisss isrealy awhsome.',
-	'The big brown fox jumps over the lazy dog.',
-	'Did the big brown fox jump over the lazy dog?',
-	"Peter Piper picked a peck of pickled peppers. How many pickled peppers did Peter Piper pick?",
-	"She sells sea-shells on the sea-shore. The shells she sells are sea-shells I'm sure.",
-	"Tajima Airport serves Toyooka.",
-	#From The web (random long utterance)
-	# 'On offering to help the blind man, the man who then stole his car, had not, at that precise moment, had any evil intention, quite the contrary, \
-	# what he did was nothing more than obey those feelings of generosity and altruism which, as everyone knows, \
-	# are the two best traits of human nature and to be found in much more hardened criminals than this one, a simple car-thief without any hope of advancing in his profession, \
-	# exploited by the real owners of this enterprise, for it is they who take advantage of the needs of the poor.',
-	# A final Thank you note!
-	'Thank you so much for your support!',
+		"A demarcação das novas fronteiras e a mudança dos povos aldeados não transcorreram sem dificuldades.",
+		"A inauguração da vila é quarta ou quinta-feira",
+        "Vote se você tiver o título de eleitor",
+        "Hoje é fundamental encontrar a razão da existência humana",
+        "A temperatura é mais amena à noite",
+        "Em muitas cidades a população está diminuindo.",
+        "Nunca se deve ficar em cima do morro",
+        "Para as pessoas estranhas o panorama é desolador",
+        "É bom te ver colhendo flores menino",
+        "Eu finjo me banhar num lago ao amanhecer",
+        "Sua sensibilidade mostrará o caminho",
+        "A Amazônia é a reserva ecológica do globo",
+        "O ministério mudou demais com a eleição",
+        "Novas metas surgem na informática",
+        "O capital de uma empresa depende de sua produção",
+        "Se não fosse ela tudo teria sido melhor",
+        "A principal personagem no filme é uma gueixa",
+        "Espere seu amigo em casa",
+        "A juventude tinha que revolucionar a escola",
+        "A cantora terá quatro meses para ensaiar seu canto",
+		"Esse tema foi falado no congresso."
 	],
 
 	#Wavenet Debug

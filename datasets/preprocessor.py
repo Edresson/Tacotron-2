@@ -5,7 +5,7 @@ from functools import partial
 import numpy as np
 from datasets import audio
 from wavenet_vocoder.util import is_mulaw, is_mulaw_quantize, mulaw, mulaw_quantize
-
+import codecs
 
 def build_from_path(hparams, input_dirs, mel_dir, linear_dir, wav_dir, n_jobs=12, tqdm=lambda x: x):
 	"""
@@ -23,23 +23,26 @@ def build_from_path(hparams, input_dirs, mel_dir, linear_dir, wav_dir, n_jobs=12
 	Returns:
 		- A list of tuple describing the train examples. this should be written to train.txt
 	"""
-
+	
 	# We use ProcessPoolExecutor to parallelize across processes, this is just for
 	# optimization purposes and it can be omited
 	executor = ProcessPoolExecutor(max_workers=n_jobs)
 	futures = []
 	index = 1
 	for input_dir in input_dirs:
-		with open(os.path.join(input_dir, 'metadata.csv'), encoding='utf-8') as f:
-			for line in f:
-				parts = line.strip().split('|')
-				basename = parts[0]
-				wav_path = os.path.join(input_dir, 'wavs', '{}.wav'.format(basename))
-				text = parts[2]
-				futures.append(executor.submit(partial(_process_utterance, mel_dir, linear_dir, wav_dir, basename, wav_path, text, hparams)))
-				index += 1
-
+		transcript = os.path.join(input_dir, 'texts.csv')
+		lines = codecs.open(transcript, 'r', 'utf-8').readlines()
+		for line in lines:
+			fname,text = line.strip().split("==")
+			basename= os.path.join(input_dir, "wavs", fname.split('/')[1])
+			wav_path = basename 
+			file_name = os.path.basename(basename)
+			if int(file_name.split('-')[1].replace('.wav','')) >= 5655 and int(file_name.split('-')[1].replace('.wav',''))<=5674:
+				continue
+			futures.append(executor.submit(partial(_process_utterance, mel_dir, linear_dir, wav_dir, basename, wav_path, text, hparams)))
+			index += 1
 	return [future.result() for future in tqdm(futures) if future.result() is not None]
+
 
 
 def _process_utterance(mel_dir, linear_dir, wav_dir, index, wav_path, text, hparams):
