@@ -77,17 +77,16 @@ hparams = tf.contrib.training.HParams(
 
 	#Mel spectrogram
 	sample_rate = 22050,
-    preemphasis = 0.97,
-    n_fft = 2048,
-    frame_shift = 0.011609, # seconds
-    frame_length = 0.04643,  # seconds
-    hop_length = 256, #int(sample_rate * frame_shift)  # samples. =256.
-    hop_size = hop_length, 
-    #win_length  = 1024
-    win_length = 1024,#int(sample_rate * frame_length)  # samples. =1024.
-    n_mels = 80,  # Number of Mel banks to generate
-    max_db = 100,
-    ref_db = 20,
+	n_fft = 2048,
+	frame_shift = 0.011609, # seconds
+	frame_length = 0.04643,  # seconds
+	hop_length = 256, #int(sample_rate * frame_shift)  # samples. =256.
+	hop_size = hop_length, 
+	#win_length  = 1024
+	win_length = 1024,#int(sample_rate * frame_length)  # samples. =1024.
+	n_mels = 80,  # Number of Mel banks to generate
+	max_db = 100,
+	ref_db = 20,
 
 
 	#M-AILABS (and other datasets) trim params (there parameters are usually correct for any data, but definitely must be tuned for specific speakers)
@@ -349,24 +348,24 @@ hparams = tf.contrib.training.HParams(
 	sentences = [
 		"A demarcação das novas fronteiras e a mudança dos povos aldeados não transcorreram sem dificuldades.",
 		"A inauguração da vila é quarta ou quinta-feira",
-        "Vote se você tiver o título de eleitor",
-        "Hoje é fundamental encontrar a razão da existência humana",
-        "A temperatura é mais amena à noite",
-        "Em muitas cidades a população está diminuindo.",
-        "Nunca se deve ficar em cima do morro",
-        "Para as pessoas estranhas o panorama é desolador",
-        "É bom te ver colhendo flores menino",
-        "Eu finjo me banhar num lago ao amanhecer",
-        "Sua sensibilidade mostrará o caminho",
-        "A Amazônia é a reserva ecológica do globo",
-        "O ministério mudou demais com a eleição",
-        "Novas metas surgem na informática",
-        "O capital de uma empresa depende de sua produção",
-        "Se não fosse ela tudo teria sido melhor",
-        "A principal personagem no filme é uma gueixa",
-        "Espere seu amigo em casa",
-        "A juventude tinha que revolucionar a escola",
-        "A cantora terá quatro meses para ensaiar seu canto",
+		"Vote se você tiver o título de eleitor",
+		"Hoje é fundamental encontrar a razão da existência humana",
+		"A temperatura é mais amena à noite",
+		"Em muitas cidades a população está diminuindo.",
+		"Nunca se deve ficar em cima do morro",
+		"Para as pessoas estranhas o panorama é desolador",
+		"É bom te ver colhendo flores menino",
+		"Eu finjo me banhar num lago ao amanhecer",
+		"Sua sensibilidade mostrará o caminho",
+		"A Amazônia é a reserva ecológica do globo",
+		"O ministério mudou demais com a eleição",
+		"Novas metas surgem na informática",
+		"O capital de uma empresa depende de sua produção",
+		"Se não fosse ela tudo teria sido melhor",
+		"A principal personagem no filme é uma gueixa",
+		"Espere seu amigo em casa",
+		"A juventude tinha que revolucionar a escola",
+		"A cantora terá quatro meses para ensaiar seu canto",
 		"Esse tema foi falado no congresso."
 	],
 
