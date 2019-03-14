@@ -77,7 +77,7 @@ def linearspectrogram(wav, hparams):
 
     # Transpose
     mag = mag.T.astype(np.float32)  # (T, 1+n_fft//2)
-	return mag
+    return mag
 
 def melspectrogram(wav, hparams):
     # stft
