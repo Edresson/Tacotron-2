@@ -58,23 +58,30 @@ def get_hop_size(hparams):
 	return hop_size
 
 def linearspectrogram(wav, hparams):
-	# D = _stft(preemphasis(wav, hparams.preemphasis, hparams.preemphasize), hparams)
-	D = _stft(wav, hparams)
-	S = _amp_to_db(np.abs(D)**hparams.magnitude_power, hparams) - hparams.ref_level_db
-
-	if hparams.signal_normalization:
-		return _normalize(S, hparams)
-	return S
-
-def melspectrogram(wav, hparams):
-    # Trimming
-    y, _ = librosa.effects.trim(wav)
-
-    # Preemphasis
-    y = np.append(y[0], y[1:] - hparams.preemphasis * y[:-1])
+	# Trimming
  
     # stft
-    linear = librosa.stft(y=y,
+    linear = librosa.stft(y=wav,
+                          n_fft=hparams.n_fft,
+                          hop_length=hparams.hop_length,
+                          win_length=hparams.win_length)
+
+    # magnitude spectrogram
+    mag = np.abs(linear)  # (1+n_fft//2, T)
+
+    mag = np.abs(linear)  # (1+n_fft//2, T)
+    mag = 20 * np.log10(np.maximum(1e-5, mag))
+
+    # normalize
+    mag = np.clip((mag - hp.ref_db + hp.max_db) / hp.max_db, 1e-8, 1)
+
+    # Transpose
+    mag = mag.T.astype(np.float32)  # (T, 1+n_fft//2)
+	return mag
+
+def melspectrogram(wav, hparams):
+    # stft
+    linear = librosa.stft(y=wav,
                           n_fft=hparams.n_fft,
                           hop_length=hparams.hop_length,
                           win_length=hparams.win_length)
