@@ -104,7 +104,7 @@ def inv_linear_spectrogram(linear_spectrogram, hparams):
 	else:
 		D = linear_spectrogram
 
-	S = _db_to_amp(D + hparams.ref_level_db)**(1/hparams.magnitude_power) #Convert back to linear
+	S = _db_to_amp(D + hparams.ref_level_db)**(1/hparams.power) #Convert back to linear
 
 	if hparams.use_lws:
 		processor = _lws_processor(hparams)
@@ -122,7 +122,7 @@ def inv_mel_spectrogram(mel_spectrogram, hparams):
 	else:
 		D = mel_spectrogram
 
-	S = _mel_to_linear(_db_to_amp(D + hparams.ref_level_db)**(1/hparams.magnitude_power), hparams)  # Convert back to linear
+	S = _mel_to_linear(_db_to_amp(D + hparams.ref_level_db)**(1/hparams.power), hparams)  # Convert back to linear
 
 	if hparams.use_lws:
 		processor = _lws_processor(hparams)
@@ -146,7 +146,7 @@ def inv_linear_spectrogram_tensorflow(spectrogram, hparams):
 	else:
 		D = linear_spectrogram
 
-	S = tf.pow(_db_to_amp_tensorflow(D + hparams.ref_level_db), (1/hparams.magnitude_power))
+	S = tf.pow(_db_to_amp_tensorflow(D + hparams.ref_level_db), (1/hparams.power))
 	return _griffin_lim_tensorflow(tf.pow(S, hparams.power), hparams)
 
 def inv_mel_spectrogram_tensorflow(mel_spectrogram, hparams):
@@ -159,7 +159,7 @@ def inv_mel_spectrogram_tensorflow(mel_spectrogram, hparams):
 	else:
 		D = mel_spectrogram
 
-	S = tf.pow(_db_to_amp_tensorflow(D + hparams.ref_level_db), (1/hparams.magnitude_power))
+	S = tf.pow(_db_to_amp_tensorflow(D + hparams.ref_level_db), (1/hparams.power))
 	S = _mel_to_linear_tensorflow(S, hparams)  # Convert back to linear
 	return _griffin_lim_tensorflow(tf.pow(S, hparams.power), hparams)
 
