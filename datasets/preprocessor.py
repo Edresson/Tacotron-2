@@ -23,7 +23,7 @@ def build_from_path(hparams, input_dirs, mel_dir, linear_dir, wav_dir, n_jobs=12
 	Returns:
 		- A list of tuple describing the train examples. this should be written to train.txt
 	"""
-	
+	print(input_dirs,nel_dir,linear_dir,wav_dir)
 	# We use ProcessPoolExecutor to parallelize across processes, this is just for
 	# optimization purposes and it can be omited
 	executor = ProcessPoolExecutor(max_workers=n_jobs)
