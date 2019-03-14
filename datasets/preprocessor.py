@@ -13,7 +13,7 @@ def build_from_path(hparams, input_dirs, mel_dir, linear_dir, wav_dir, n_jobs=12
 
 	Args:
 		- hparams: hyper parameters
-		- input_dir: input directory that contains the files to prerocess
+		- input_dir: input directory that contains the files to preprocess
 		- mel_dir: output directory of the preprocessed speech mel-spectrogram dataset
 		- linear_dir: output directory of the preprocessed speech linear-spectrogram dataset
 		- wav_dir: output directory of the preprocessed speech audio dataset
