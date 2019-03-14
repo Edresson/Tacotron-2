@@ -74,9 +74,6 @@ def linearspectrogram(wav, hparams):
 
     # normalize
     mag = np.clip((mag - hparams.ref_db + hparams.max_db) / hparams.max_db, 1e-8, 1)
-
-    # Transpose
-    mag = mag.T.astype(np.float32)  # (T, 1+n_fft//2)
     return mag
 
 def melspectrogram(wav, hparams):
@@ -98,12 +95,6 @@ def melspectrogram(wav, hparams):
 
     # normalize
     mel = np.clip((mel - hparams.ref_db + hparams.max_db) / hparams.max_db, 1e-8, 1)
-
-
-    # Transpose
-    #mel = mel.astype(np.float32)  # ( n_mels,T)
-    mel = mel.T.astype(np.float32)  # ( n_mels,T)
-    
     return mel
 
 def inv_linear_spectrogram(linear_spectrogram, hparams):

@@ -126,7 +126,7 @@ def _process_utterance(mel_dir, linear_dir, wav_dir, index, wav_path, text, hpar
 	#Compute the linear scale spectrogram from the wav
 	linear_spectrogram = audio.linearspectrogram(preem_wav, hparams).astype(np.float32)
 	linear_frames = linear_spectrogram.shape[1]
-
+	
 	#sanity check
 	assert linear_frames == mel_frames
 
