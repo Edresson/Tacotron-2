@@ -39,7 +39,7 @@ def build_from_path(hparams, input_dirs, mel_dir, linear_dir, wav_dir, n_jobs=12
 			file_name = os.path.basename(basename)
 			if int(file_name.split('-')[1].replace('.wav','')) >= 5655 and int(file_name.split('-')[1].replace('.wav',''))<=5674:
 				continue
-			futures.append(executor.submit(partial(_process_utterance, mel_dir, linear_dir, wav_dir, basename, wav_path, text, hparams)))
+			futures.append(executor.submit(partial(_process_utterance, mel_dir, linear_dir, wav_dir, file_name, wav_path, text, hparams)))
 			index += 1
 	return [future.result() for future in tqdm(futures) if future.result() is not None]
 
@@ -48,10 +48,8 @@ def build_from_path(hparams, input_dirs, mel_dir, linear_dir, wav_dir, n_jobs=12
 def _process_utterance(mel_dir, linear_dir, wav_dir, index, wav_path, text, hparams):
 	"""
 	Preprocesses a single utterance wav/text pair
-
 	this writes the mel scale spectogram to disk and return a tuple to write
 	to the train.txt file
-
 	Args:
 		- mel_dir: the directory to write the mel spectograms into
 		- linear_dir: the directory to write the linear spectrograms into
@@ -60,7 +58,6 @@ def _process_utterance(mel_dir, linear_dir, wav_dir, index, wav_path, text, hpar
 		- wav_path: path to the audio file containing the speech input
 		- text: text spoken in the input audio file
 		- hparams: hyper parameters
-
 	Returns:
 		- A tuple: (audio_filename, mel_filename, linear_filename, time_steps, mel_frames, linear_frames, text)
 	"""
@@ -126,7 +123,7 @@ def _process_utterance(mel_dir, linear_dir, wav_dir, index, wav_path, text, hpar
 	#Compute the linear scale spectrogram from the wav
 	linear_spectrogram = audio.linearspectrogram(preem_wav, hparams).astype(np.float32)
 	linear_frames = linear_spectrogram.shape[1]
-	
+
 	#sanity check
 	assert linear_frames == mel_frames
 
