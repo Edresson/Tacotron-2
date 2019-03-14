@@ -81,7 +81,7 @@ hparams = tf.contrib.training.HParams(
 	frame_shift = 0.011609, # seconds
 	frame_length = 0.04643,  # seconds
 	hop_length = 256, #int(sample_rate * frame_shift)  # samples. =256.
-	hop_size = hop_length, 
+	hop_size = 256, 
 	#win_length  = 1024
 	win_length = 1024,#int(sample_rate * frame_length)  # samples. =1024.
 	n_mels = 80,  # Number of Mel banks to generate
