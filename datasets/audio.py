@@ -67,7 +67,6 @@ def linearspectrogram(wav, hparams):
 	return S
 
 def melspectrogram(wav, hparams):
-	
     # Trimming
     y, _ = librosa.effects.trim(y)
 
@@ -98,7 +97,7 @@ def melspectrogram(wav, hparams):
     #mel = mel.astype(np.float32)  # ( n_mels,T)
     mel = mel.T.astype(np.float32)  # ( n_mels,T)
     
-	return mel
+    return mel
 
 def inv_linear_spectrogram(linear_spectrogram, hparams):
 	'''Converts linear spectrogram to waveform using librosa'''
