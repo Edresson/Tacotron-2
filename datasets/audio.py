@@ -68,7 +68,7 @@ def linearspectrogram(wav, hparams):
 
 def melspectrogram(wav, hparams):
     # Trimming
-    y, _ = librosa.effects.trim(y)
+    y, _ = librosa.effects.trim(wav)
 
     # Preemphasis
     y = np.append(y[0], y[1:] - hparams.preemphasis * y[:-1])
