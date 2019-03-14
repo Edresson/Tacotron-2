@@ -76,12 +76,20 @@ hparams = tf.contrib.training.HParams(
 	silence_threshold=2, #silence threshold used for sound trimming for wavenet preprocessing
 
 	#Mel spectrogram
-	n_fft = 2048, #Extra window size is filled with 0 paddings to match this parameter
-	hop_size = 275, #For 22050Hz, 275 ~= 12.5 ms (0.0125 * sample_rate)
-	win_size = 1100, #For 22050Hz, 1100 ~= 50 ms (If None, win_size = n_fft) (0.05 * sample_rate)
-	sample_rate = 22050, #22050 Hz (corresponding to ljspeech dataset) (sox --i <filename>)
-	frame_shift_ms = None, #Can replace hop_size parameter. (Recommended: 12.5)
-	magnitude_power = 2., #The power of the spectrogram magnitude (1. for energy, 2. for power)
+	sample_rate = 22050,
+    preemphasis = 0.97,
+    n_fft = 2048,
+    frame_shift = 0.011609, # seconds
+    frame_length = 0.04643,  # seconds
+    hop_length = 256, #int(sample_rate * frame_shift)  # samples. =256.
+    hop_size = hop_length, 
+    #win_length  = 1024
+    win_length = 1024,#int(sample_rate * frame_length)  # samples. =1024.
+    n_mels = 80,  # Number of Mel banks to generate
+    num_mels = n_mels,
+    max_db = 100,
+    ref_db = 20,
+
 
 	#M-AILABS (and other datasets) trim params (there parameters are usually correct for any data, but definitely must be tuned for specific speakers)
 	trim_silence = True, #Whether to clip silence in Audio (at beginning and end of audio only, not the middle)

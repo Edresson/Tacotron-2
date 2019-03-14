@@ -5,7 +5,6 @@ import tensorflow as tf
 from scipy import signal
 from scipy.io import wavfile
 
-
 def load_wav(path, sr):
 	return librosa.core.load(path, sr=sr)[0]
 
@@ -68,13 +67,38 @@ def linearspectrogram(wav, hparams):
 	return S
 
 def melspectrogram(wav, hparams):
-	# D = _stft(preemphasis(wav, hparams.preemphasis, hparams.preemphasize), hparams)
-	D = _stft(wav, hparams)
-	S = _amp_to_db(_linear_to_mel(np.abs(D)**hparams.magnitude_power, hparams), hparams) - hparams.ref_level_db
+	
+    # Trimming
+    y, _ = librosa.effects.trim(y)
 
-	if hparams.signal_normalization:
-		return _normalize(S, hparams)
-	return S
+    # Preemphasis
+    y = np.append(y[0], y[1:] - hparams.preemphasis * y[:-1])
+ 
+    # stft
+    linear = librosa.stft(y=y,
+                          n_fft=hparams.n_fft,
+                          hop_length=hparams.hop_length,
+                          win_length=hparams.win_length)
+
+    # magnitude spectrogram
+    mag = np.abs(linear)  # (1+n_fft//2, T)
+
+    # mel spectrogram
+    mel_basis = librosa.filters.mel(hparams.sample_rate, hparams.n_fft, hparams.n_mels)  # (n_mels, 1+n_fft//2)
+    mel = np.dot(mel_basis, mag)  # (n_mels, t)
+
+    # to decibel
+    mel = 20 * np.log10(np.maximum(1e-5, mel))
+
+    # normalize
+    mel = np.clip((mel - hparams.ref_db + hparams.max_db) / hparams.max_db, 1e-8, 1)
+
+
+    # Transpose
+    #mel = mel.astype(np.float32)  # ( n_mels,T)
+    mel = mel.T.astype(np.float32)  # ( n_mels,T)
+    
+	return mel
 
 def inv_linear_spectrogram(linear_spectrogram, hparams):
 	'''Converts linear spectrogram to waveform using librosa'''
