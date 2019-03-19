@@ -16,6 +16,7 @@ from time import sleep
 import tensorflow as tf
 from hparams import hparams, hparams_debug_string
 from infolog import log
+from tqdm import tqdm
 
 import os
 import wave
