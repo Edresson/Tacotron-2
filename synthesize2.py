@@ -114,13 +114,13 @@ def generate_fast(model, text):
 
 def run_live(args, checkpoint_path, hparams):
 	#Log to Terminal without keeping any records in files
-	log(hparams_debug_string())
+	#log(hparams_debug_string())
 	synth = Synthesizer()
 	synth.load(checkpoint_path, hparams)
 
 	#Generate fast greeting message
 	greetings = 'Hello, Welcome to the Live testing tool. Please type a message and I will try to read it!'
-	log(greetings)
+	#log(greetings)
 	generate_fast(synth, greetings)
 
 	#Interaction loop
