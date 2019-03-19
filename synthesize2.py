@@ -7,6 +7,16 @@ import tensorflow as tf
 from hparams import hparams
 from infolog import log
 
+import argparse
+import os
+import re
+import time
+from time import sleep
+
+import tensorflow as tf
+from hparams import hparams, hparams_debug_string
+from infolog import log
+
 import os
 import wave
 from datetime import datetime
