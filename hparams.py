@@ -67,7 +67,7 @@ hparams = tf.contrib.training.HParams(
 	tacotron_random_seed = 5339, #Determines initial graph and operations (i.e: model) random state for reproducibility
 	tacotron_swap_with_cpu = False, #Whether to use cpu as support to gpu for decoder computation (Not recommended: may cause major slowdowns! Only use when critical!)
 
-	tacotron_batch_size = 2, #number of training samples on each training steps
+	tacotron_batch_size = 32, #number of training samples on each training steps
 	tacotron_reg_weight = 1e-7, #regularization weight (for L2 regularization)
 	tacotron_scale_regularization = True, #Whether to rescale regularization weight to adapt for outputs range (used when reg_weight is high and biasing the model)
 
@@ -76,7 +76,7 @@ hparams = tf.contrib.training.HParams(
 	tacotron_data_random_state=1234, #random state for train test split repeatability
         test_steps = 21,
 	#Usually your GPU can handle 16x tacotron_batch_size during synthesis for the same memory amount during training (because no gradients to keep and ops to register for backprop)
-	tacotron_synthesis_batch_size = 1, #This ensures GTA synthesis goes up to 40x faster than one sample at a time and uses 100% of your GPU computation power.
+	tacotron_synthesis_batch_size = 16*tacotron_batch_size , #This ensures GTA synthesis goes up to 40x faster than one sample at a time and uses 100% of your GPU computation power.
 
 	tacotron_decay_learning_rate = True, #boolean, determines if the learning rate will follow an exponential decay
 	tacotron_start_decay = 50000, #Step at which learning decay starts
