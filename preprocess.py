@@ -16,6 +16,7 @@ def preprocess(args, input_folders, out_dir, hparams):
 	os.makedirs(bap_dir, exist_ok=True)
 	metadata = preprocessor.build_from_path(hparams, input_folders, lf0_dir, mgc_dir, bap_dir, args.n_jobs, tqdm=tqdm)
 	write_metadata(metadata, out_dir)
+	
 
 def write_metadata(metadata, out_dir):
 	with open(os.path.join(out_dir, 'train.txt'), 'w', encoding='utf-8') as f:

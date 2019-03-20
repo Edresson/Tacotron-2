@@ -3,7 +3,7 @@ from concurrent.futures import ProcessPoolExecutor
 from functools import partial
 import numpy as np
 from datasets import audio
-
+import codecs
 
 def build_from_path(hparams, input_dirs, lf0_dir, mgc_dir, bap_dir, n_jobs=12, tqdm=lambda x: x):
 	"""
@@ -28,18 +28,64 @@ def build_from_path(hparams, input_dirs, lf0_dir, mgc_dir, bap_dir, n_jobs=12, t
 	futures = []
 	index = 1
 	for input_dir in input_dirs:
-		trn_files = glob.glob(os.path.join(input_dir, 'biaobei_48000', '*.trn'))
-		for trn in trn_files:
-			with open(trn) as f:
-				basename = trn[:-4]
-				wav_file = basename + '.wav'
-				wav_path = wav_file
-				basename = basename.split('/')[-1]
-				text = f.readline().strip()
-				futures.append(executor.submit(partial(_process_utterance, lf0_dir, mgc_dir, bap_dir, basename, wav_path, text, hparams)))
-				index += 1
+		transcript = os.path.join(input_dir, 'texts.csv')
+		lines = codecs.open(transcript, 'r', 'utf-8').readlines()
+		for line in lines:
+			fname,text = line.strip().split("==")
+			basename= os.path.join(input_dir, "wavs", fname.split('/')[1])
+			wav_file = basename 
+			wav_path = wav_file
+			basename = os.path.basename(basename)
+			file_name=basename
+			if int(file_name.split('-')[1].replace('.wav','')) >= 5655 and int(file_name.split('-')[1].replace('.wav',''))<=5674:
+				continue
+			futures.append(executor.submit(partial(_process_utterance, lf0_dir, mgc_dir, bap_dir, basename, wav_path, text, hparams)))
+			index += 1
 
 	return [future.result() for future in tqdm(futures) if future.result() is not None]
+
+
+def build_from_path_test(hparams, input_dirs, lf0_dir, mgc_dir, bap_dir, n_jobs=12, tqdm=lambda x: x):
+	"""
+	Preprocesses the speech dataset from a gven input path to given output directories
+
+	Args:
+		- hparams: hyper parameters
+		- input_dir: input directory that contains the files to prerocess
+		- mel_dir: output directory of the preprocessed speech mel-spectrogram dataset
+		- linear_dir: output directory of the preprocessed speech linear-spectrogram dataset
+		- wav_dir: output directory of the preprocessed speech audio dataset
+		- n_jobs: Optional, number of worker process to parallelize across
+		- tqdm: Optional, provides a nice progress bar
+
+	Returns:
+		- A list of tuple describing the train examples. this should be written to train.txt
+	"""
+
+	# We use ProcessPoolExecutor to parallelize across processes, this is just for
+	# optimization purposes and it can be omited
+	executor = ProcessPoolExecutor(max_workers=n_jobs)
+	futures = []
+	index = 1
+	for input_dir in input_dirs:
+		transcript = os.path.join(input_dir, 'texts.csv')
+		lines = codecs.open(transcript, 'r', 'utf-8').readlines()
+		for line in lines:
+			fname,text = line.strip().split("==")
+			basename= os.path.join(input_dir, "wavs", fname.split('/')[1])
+			wav_file = basename 
+			wav_path = wav_file
+			basename = os.path.basename(basename)
+			file_name=basename
+			if int(file_name.split('-')[1].replace('.wav','')) >= 5655 and int(file_name.split('-')[1].replace('.wav',''))<=5674:
+				futures.append(executor.submit(partial(_process_utterance, lf0_dir, mgc_dir, bap_dir, basename, wav_path, text, hparams)))
+				index += 1
+			else:
+				continue
+
+
+	return [future.result() for future in tqdm(futures) if future.result() is not None]
+
 
 
 def _process_utterance(lf0_dir, mgc_dir, bap_dir, index, wav_path, text, hparams):
