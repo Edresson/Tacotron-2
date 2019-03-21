@@ -25,7 +25,7 @@ def preprocess_test(args, input_folders, out_dir, hparams):
 	os.makedirs(mgc_dir, exist_ok=True)
 	os.makedirs(bap_dir, exist_ok=True)
 	metadata = preprocessor.build_from_path_test(hparams, input_folders, lf0_dir, mgc_dir, bap_dir, args.n_jobs, tqdm=tqdm)
-	write_metadata(metadata, out_dir)
+	write_metadata_test(metadata, out_dir)
 
 def write_metadata_test(metadata, out_dir):
 	with open(os.path.join(out_dir, 'test.txt'), 'w', encoding='utf-8') as f:
