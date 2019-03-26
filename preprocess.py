@@ -45,7 +45,7 @@ def norm_data(args):
 		return [os.path.join(args.base_dir, args.dataset)]
 
 	if args.dataset.startswith('TTS-Portuguese'):
-		return [os.path.join('..',args.base_dir, 'TTS-Portuguese')]
+		return [os.path.join('..',args.base_dir, 'TTS-Portuguese-Corpus')]
 
 	if args.dataset.startswith('THCHS-30'):
 		return [os.path.join(args.base_dir, 'data_thchs30')]
