@@ -46,7 +46,7 @@ def norm_data(args):
 
 	if args.dataset.startswith('TTS-Portuguese'):
 		return [os.path.join('..',args.base_dir, 'TTS-Portuguese')]
-		
+
 	if args.dataset.startswith('THCHS-30'):
 		return [os.path.join(args.base_dir, 'data_thchs30')]
 
@@ -94,7 +94,7 @@ def main():
 	parser.add_argument('--base_dir', default='')
 	parser.add_argument('--hparams', default='',
 		help='Hyperparameter overrides as a comma-separated list of name=value pairs')
-	parser.add_argument('--dataset', default='THCHS-30')
+	parser.add_argument('--dataset', default='TTS-Portuguese')
 	parser.add_argument('--language', default='en_US')
 	parser.add_argument('--voice', default='female')
 	parser.add_argument('--reader', default='mary_ann')
