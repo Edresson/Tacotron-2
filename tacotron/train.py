@@ -199,7 +199,7 @@ def train(log_dir, args, hparams):
 					linear_loss = None
 
 					if hparams.predict_linear:
-						for i in tqdm(range(feeder.test_steps)):
+						for i in range(feeder.test_steps):
 							eloss, before_loss, after_loss, stop_token_loss, linear_loss, mel_p, mel_t, t_len, align, lin_p = sess.run(
 								[eval_model.loss, eval_model.before_loss, eval_model.after_loss,
 								eval_model.stop_token_loss, eval_model.linear_loss, eval_model.mel_outputs[0],
@@ -210,12 +210,13 @@ def train(log_dir, args, hparams):
 							after_losses.append(after_loss)
 							stop_token_losses.append(stop_token_loss)
 							linear_losses.append(linear_loss)
+							print('test_steps:',i,' de ',feeder.test_steps)
 						linear_loss = sum(linear_losses) / len(linear_losses)
 
 						wav = audio.inv_linear_spectrogram(lin_p.T, hparams)
 						audio.save_wav(wav, os.path.join(eval_wav_dir, 'step-{}-eval-waveform-linear.wav'.format(step)), hparams)
 					else:
-						for i in tqdm(range(feeder.test_steps)):
+						for i in range(feeder.test_steps):
 							eloss, before_loss, after_loss, stop_token_loss, mel_p, mel_t, t_len, align = sess.run(
 								[eval_model.loss, eval_model.before_loss, eval_model.after_loss,
 								eval_model.stop_token_loss, eval_model.mel_outputs[0], eval_model.mel_targets[0],
@@ -224,6 +225,7 @@ def train(log_dir, args, hparams):
 							before_losses.append(before_loss)
 							after_losses.append(after_loss)
 							stop_token_losses.append(stop_token_loss)
+							print('test_steps:',i,' de ',feeder.test_steps)
 
 					eval_loss = sum(eval_losses) / len(eval_losses)
 					before_loss = sum(before_losses) / len(before_losses)
