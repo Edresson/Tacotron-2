@@ -3,7 +3,7 @@ from concurrent.futures import ProcessPoolExecutor
 from functools import partial
 import numpy as np
 from datasets import audio
-
+import codecs
 
 def build_from_path(hparams, input_dirs, mel_dir, linear_dir, wav_dir, n_jobs=12, tqdm=lambda x: x):
 	"""
@@ -24,21 +24,24 @@ def build_from_path(hparams, input_dirs, mel_dir, linear_dir, wav_dir, n_jobs=12
 
 	# We use ProcessPoolExecutor to parallelize across processes, this is just for
 	# optimization purposes and it can be omited
+	print(input_dirs,mel_dir,linear_dir,wav_dir)
+	# We use ProcessPoolExecutor to parallelize across processes, this is just for
+	# optimization purposes and it can be omited
 	executor = ProcessPoolExecutor(max_workers=n_jobs)
 	futures = []
 	index = 1
 	for input_dir in input_dirs:
-		trn_files = glob.glob(os.path.join(input_dir, 'biaobei_48000', '*.trn'))
-		for trn in trn_files:
-			with open(trn) as f:
-				basename = trn[:-4]
-				wav_file = basename + '.wav'
-				wav_path = wav_file
-				basename = basename.split('/')[-1]
-				text = f.readline().strip()
-				futures.append(executor.submit(partial(_process_utterance, mel_dir, linear_dir, wav_dir, basename, wav_path, text, hparams)))
-				index += 1
-
+		transcript = os.path.join(input_dir, 'texts.csv')
+		lines = codecs.open(transcript, 'r', 'utf-8').readlines()
+		for line in lines:
+			fname,text = line.strip().split("==")
+			basename= os.path.join(input_dir, "wavs", fname.split('/')[1])
+			wav_path = basename 
+			file_name = os.path.basename(basename)
+			if int(file_name.split('-')[1].replace('.wav','')) >= 5655 and int(file_name.split('-')[1].replace('.wav',''))<=5674:
+				continue
+			futures.append(executor.submit(partial(_process_utterance, mel_dir, linear_dir, wav_dir, file_name, wav_path, text, hparams)))
+			index += 1
 	return [future.result() for future in tqdm(futures) if future.result() is not None]
 
 
