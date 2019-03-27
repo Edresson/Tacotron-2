@@ -37,6 +37,7 @@ def norm_data(args):
 
 	if args.dataset.startswith('LJSpeech'):
 		return [os.path.join(args.base_dir, args.dataset)]
+
 	
         if args.dataset.startswith('TTS-Portuguese'):
 		return [os.path.join('..',args.base_dir, 'TTS-Portuguese-Corpus')]
