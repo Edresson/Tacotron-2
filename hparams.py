@@ -15,8 +15,8 @@ hparams = tf.contrib.training.HParams(
 	#Audio
 	num_mgc = 60,
 	num_lf0 = 1,
-	num_vuv = 1, # 1(16KHz, 22050Hz), 5(44.1KHz, 48KHz)
-	num_bap = 1, # 1(16KHz, 22050Hz), 5(44.1KHz, 48KHz)
+	num_vuv = 1,
+	num_bap = 5, # 1(16KHz, 22050Hz), 5(44.1KHz, 48KHz)
 	frame_period = 15, #15ms
 	sample_rate = 48000, #22050 Hz (corresponding to ljspeech dataset)
 	use_harvest = True, 
