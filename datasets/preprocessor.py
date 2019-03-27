@@ -3,7 +3,7 @@ from concurrent.futures import ProcessPoolExecutor
 from functools import partial
 import numpy as np
 from datasets import audio
-
+import codecs
 
 def build_from_path(hparams, input_dirs, feat_dir, n_jobs=12, tqdm=lambda x: x):
 	"""
