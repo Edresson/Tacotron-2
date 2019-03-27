@@ -39,7 +39,7 @@ def feature_extract(wav, hp):
 		vuv = (aperiodicity[:, 0] < 0.5).astype(np.float32)[:, None]
 	else:
 		vuv = (lf0 != 0).astype(np.float32)
-
+        print(mgc.shape,lf0.shape,vuv.shape,bap.shape)
 	features = np.hstack((mgc, lf0, vuv, bap))
 	return features.astype(np.float32)
 
