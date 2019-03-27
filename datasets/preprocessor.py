@@ -40,7 +40,7 @@ def build_from_path(hparams, input_dirs, feat_dir, n_jobs=12, tqdm=lambda x: x):
 			if int(file_name.split('-')[1].replace('.wav','')) >= 5655 and int(file_name.split('-')[1].replace('.wav',''))<=5674:
 				continue
 			futures.append(executor.submit(partial(_process_utterance, feat_dir, basename, wav_path, text, hparams)))
-				index += 1
+			index += 1
 
 	return [future.result() for future in tqdm(futures) if future.result() is not None]
 
