@@ -16,25 +16,25 @@ class Tacotron():
 		self._hparams = hparams
 
 
-	def initialize(self, inputs, input_lengths, lf0_targets=None, mgc_targets=None, bap_targets=None, stop_token_targets=None, targets_lengths=None, gta=False,
+	def initialize(self, inputs, input_lengths, feature_targets=None, stop_token_targets=None, targets_lengths=None, gta=False,
 			global_step=None, is_training=False, is_evaluating=False):
 		"""
 		Initializes the model for inference
 
-		sets "lf0_outputs" and "alignments" fields.
+		sets "feature_outputs" and "alignments" fields.
 
 		Args:
 			- inputs: int32 Tensor with shape [N, T_in] where N is batch size, T_in is number of
 			  steps in the input time series, and values are character IDs
 			- input_lengths: int32 Tensor with shape [N] where N is batch size and values are the lengths
 			of each sequence in inputs.
-			- lf0_targets: float32 Tensor with shape [N, T_out, M] where N is batch size, T_out is number
-			of steps in the output time series, M is num_lf0, and values are entries in the lf0
-			spectrogram. Only needed for training.
+			- feature_targets: float32 Tensor with shape [N, T_out, M] where N is batch size, T_out is number
+			of steps in the output time series, M is num_mgc + num_lf0 + num_vuv + num_bap, and values are
+			entries in the spectrogram. Only needed for training.
 		"""
-		if lf0_targets is None and stop_token_targets is not None:
-			raise ValueError('no lf0 targets were provided but token_targets were given')
-		if lf0_targets is not None and stop_token_targets is None and not gta:
+		if feature_targets is None and stop_token_targets is not None:
+			raise ValueError('no feature targets were provided but token_targets were given')
+		if feature_targets is not None and stop_token_targets is None and not gta:
 			raise ValueError('Mel targets are provided without corresponding token_targets')
 		if gta and mgc_targets is not None:
 			raise ValueError('Linear spectrogram prediction is not supported in GTA mode!')
@@ -46,7 +46,7 @@ class Tacotron():
 		with tf.variable_scope('inference') as scope:
 			batch_size = tf.shape(inputs)[0]
 			hp = self._hparams
-			target_depth = hp.num_lf0 + hp.num_mgc + hp.num_bap
+			target_depth = hp.num_mgc + hp.num_lf0 + hp.num_vuv + hp.num_bap
 			assert hp.tacotron_teacher_forcing_mode in ('constant', 'scheduled')
 			if hp.tacotron_teacher_forcing_mode == 'scheduled' and is_training:
 				assert global_step is not None
@@ -91,8 +91,7 @@ class Tacotron():
 
 			#Define the helper for our decoder
 			if is_training or is_evaluating or gta:
-				decoder_targets = tf.concat([tf.expand_dims(lf0_targets, axis=-1), mgc_targets, bap_targets], axis=-1)
-				self.helper = TacoTrainingHelper(batch_size, decoder_targets, target_depth, hp, gta, is_evaluating, global_step)
+				self.helper = TacoTrainingHelper(batch_size, feature_targets, target_depth, hp, gta, is_evaluating, global_step)
 			else:
 				self.helper = TacoTestHelper(batch_size, target_depth, hp)
 
@@ -133,13 +132,19 @@ class Tacotron():
 			final_outputs = decoder_outputs + projected_residual
 
 			#Compute each feature outputs
-			lf0_outputs = final_outputs[:, :, 0]
-			mgc_outputs = final_outputs[:, :, hp.num_lf0 : hp.num_mgc + 1]
-			bap_outputs = final_outputs[:, :, hp.num_mgc + 1:]
+			mgc_idx = 0
+			lf0_idx = mgc_idx + hp.num_mgc
+			vuv_idx = lf0_idx + hp.num_lf0
+			bap_idx = vuv_idx + hp.num_vuv
+			mgc_outputs = tf.slice(final_outputs, [0, 0, mgc_idx], [-1, -1, hp.num_mgc], name='mgc_outputs')
+			lf0_outputs = tf.slice(final_outputs, [0, 0, lf0_idx], [-1, -1, hp.num_lf0])
+			lf0_outputs = tf.squeeze(lf0_outputs, axis=-1, name='lf0_outputs')
+			vuv_outputs = tf.slice(final_outputs, [0, 0, vuv_idx], [-1, -1, hp.num_vuv], name='vuv_outputs')
+			bap_outputs = tf.slice(final_outputs, [0, 0, bap_idx], [-1, -1, hp.num_bap], name='bap_outputs')
 
 
 			#Grab alignments from the final decoder state
-			alignments = tf.transpose(final_decoder_state.alignment_history.stack(), [1, 2, 0])
+			alignments = tf.transpose(final_decoder_state.alignment_history.stack(), [1, 2, 0], name='alignments')
 
 			if is_training:
 				self.ratio = self.helper._ratio
@@ -147,15 +152,14 @@ class Tacotron():
 			self.input_lengths = input_lengths
 			self.decoder_outputs = decoder_outputs
 			self.final_outputs = final_outputs
+			self.feature_targets = feature_targets
 			self.alignments = alignments
 			self.stop_token_outputs = stop_token_outputs
 			self.stop_token_targets = stop_token_targets
 			self.lf0_outputs = lf0_outputs
 			self.mgc_outputs = mgc_outputs
+			self.vuv_outputs = vuv_outputs
 			self.bap_outputs = bap_outputs
-			self.lf0_targets = lf0_targets
-			self.mgc_targets = mgc_targets
-			self.bap_targets = bap_targets
 			self.targets_lengths = targets_lengths
 			log('Initialized Tacotron model. Dimensions (? = dynamic shape): ')
 			log('  Train mode:               {}'.format(is_training))
@@ -171,6 +175,7 @@ class Tacotron():
 			log('  final out:                {}'.format(final_outputs.shape))
 			log('  lf0 out:                  {}'.format(tf.expand_dims(lf0_outputs, axis=-1).shape))
 			log('  mgc out:                  {}'.format(mgc_outputs.shape))
+			log('  vuv out:                  {}'.format(vuv_outputs.shape))
 			log('  bap out:                  {}'.format(bap_outputs.shape))
 			log('  <stop_token> out:         {}'.format(stop_token_outputs.shape))
 
@@ -179,22 +184,29 @@ class Tacotron():
 		'''Adds loss to the model. Sets "loss" field. initialize must have been called.'''
 		with tf.variable_scope('loss') as scope:
 			hp = self._hparams
-			self.world_targets = tf.concat([tf.expand_dims(self.lf0_targets, axis=-1), self.mgc_targets, self.bap_targets], axis=-1)
 
 			if hp.mask_decoder:
 				# Compute loss of predictions before postnet
-				before_loss = MaskedMSE(self.world_targets, self.decoder_outputs, self.targets_lengths, hparams=self._hparams)
+				before_loss = MaskedMSE(self.feature_targets, self.decoder_outputs, self.targets_lengths, hparams=self._hparams)
 				# Compute loss after postnet
-				after_loss = MaskedMSE(self.world_targets, self.final_outputs, self.targets_lengths, hparams=self._hparams)
+				after_loss = MaskedMSE(self.feature_targets, self.final_outputs, self.targets_lengths, hparams=self._hparams)
 				#Compute <stop_token> loss (for learning dynamic generation stop)
 				stop_token_loss = MaskedSigmoidCrossEntropy(self.stop_token_targets,
 					self.stop_token_outputs, self.targets_lengths, hparams=self._hparams)
 
 			else:
+				# guided_attention loss
+				N = self._hparams.max_text_length
+				T = self._hparams.max_frame_num // self._hparams.outputs_per_step
+				A = tf.pad(self.alignments, [(0, 0), (0, N), (0, T)], mode="CONSTANT", constant_values=-1.)[:, :N, :T]
+				gts = tf.convert_to_tensor(GuidedAttention(N, T))
+				attention_masks = tf.to_float(tf.not_equal(A, -1))
+				attention_loss = tf.reduce_sum(tf.abs(A * gts) * attention_masks)
+				attention_loss /= tf.reduce_sum(attention_masks)
 				# Compute loss of predictions before postnet
-				before_loss = tf.reduce_mean(tf.abs(self.world_targets - self.decoder_outputs))
+				before_loss = tf.reduce_mean(tf.abs(self.feature_targets - self.decoder_outputs))
 				# Compute loss after postnet
-				after_loss = tf.reduce_mean(tf.abs(self.world_targets - self.final_outputs))
+				after_loss = tf.reduce_mean(tf.abs(self.feature_targets - self.final_outputs))
 				#Compute <stop_token> loss (for learning dynamic generation stop)
 				stop_token_loss = tf.reduce_mean(tf.nn.sigmoid_cross_entropy_with_logits(
 								labels=self.stop_token_targets,
@@ -210,8 +222,9 @@ class Tacotron():
 			self.after_loss = after_loss
 			self.stop_token_loss = stop_token_loss
 			self.regularization_loss = regularization_loss
+			self.attention_loss = attention_loss
 
-			self.loss = self.before_loss + self.after_loss + self.stop_token_loss + self.regularization_loss
+			self.loss = self.before_loss + self.after_loss + self.stop_token_loss + self.regularization_loss + self.attention_loss
 
 	def add_optimizer(self, global_step):
 		'''Adds optimizer. Sets "gradients" and "optimize" fields. add_loss must have been called.

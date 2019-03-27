@@ -13,13 +13,13 @@ hparams = tf.contrib.training.HParams(
 	###########################################################################################################################################
 
 	#Audio
-	fft_size = 2048, #1024(16KHz) 1024(22050Hz) 2048(44.1KHz) 2048(48KHz)
-	num_lf0 = 1,
 	num_mgc = 60,
-	num_bap = 5, # 1(16KHz, 22050Hz), 5(44.1KHz, 48KHz)
+	num_lf0 = 1,
+	num_vuv = 1, # 1(16KHz, 22050Hz), 5(44.1KHz, 48KHz)
+	num_bap = 1, # 1(16KHz, 22050Hz), 5(44.1KHz, 48KHz)
 	frame_period = 15, #15ms
 	sample_rate = 48000, #22050 Hz (corresponding to ljspeech dataset)
-	mcep_alpha=0.77, #0.58(16k) 0.65(22050) 0.76(44100) 0.77(48000)
+	use_harvest = True, #0.58(16k) 0.65(22050) 0.76(44100) 0.77(48000)
 	rescale_max = 0.999, #Rescaling value
 	trim_silence = True, #Whether to clip silence in Audio (at beginning and end of audio only, not the middle)
 	max_frame_num = 750,  #Only relevant when clip_mels_length = True
@@ -97,8 +97,7 @@ hparams = tf.contrib.training.HParams(
 	tacotron_synthesis_batch_size = 1, #DO NOT MAKE THIS BIGGER THAN 1 IF YOU DIDN'T TRAIN TACOTRON WITH "mask_encoder=True"!!
 	tacotron_test_size = 0.05, #% of data to keep as test data, if None, tacotron_test_batches must be not None. (5% is enough to have a good idea about overfit)
 	tacotron_test_batches = None, #number of test batches.
-	test_steps = 21,
-	
+
 	#Learning rate schedule
 	tacotron_decay_learning_rate = True, #boolean, determines if the learning rate will follow an exponential decay
 	tacotron_start_decay = 50000, #Step at which learning decay starts
@@ -227,24 +226,27 @@ hparams = tf.contrib.training.HParams(
 	# "e2 luo2 si1 zhun3 bei4 tong2 mei3 guo2 jin4 xing2 dui4 hua4 .",
 	# "fan3 zheng4 bu2 shi4 mo4 si1 ke1 yao4 tui4 chu1 zhong1 dao3 tiao2 yue1 .",
 
-        "guan1 yu2 xi1 zang4 de5 chuan2 shuo1 you2 hen3 duo1",
-        "li4 lai2","dou1 shi4 chao2 sheng4 zhe3 de5 tian1 tang2",
-        "er2 zuo4 wei2 zhong1 guo2 xi1 nan2 bian1 chui2 zhong4 di4",
-        "ye3 dou1 shi4 zhong1 guo2 ling3 tu3","bu4 ke3 fen1 ge1 de5 yi2 bu4 fen5",
-        "er4 ling2 yi1 wu3 nian2","yang1 shi4 ceng2 jing1 bo1 chu1 guo4 yi2 bu4 gao1 fen1 ji4 lu4 pian4",
-        "di4 san1 ji2","pian4 zhong1","tian1 gao1 di4 kuo4 de5 feng1 jing3 ,",
-        "rang4 wu2 shu4 ren2 dui4 xi1 zang4 qing2 gen1 shen1 zhong4 ."
-        "shi2 ge2 liang3 nian2","you2 yuan2 ban1 ren2 ma3","da3 zao4 de5 jie3 mei4 pian1"
-        "ji2 di4","qiao1 ran2 shang4 xian4 !",
-        "mei3 yi4 zheng1 dou1 shi4 bi4 zhi3","mei3 yi2 mu4 dou1 shi4 ren2 jian1 xian1 jing4 .",
-        "zi4 ying3 pian1 bo1 chu1 zhi1 lai2","hao3 ping2 ru2 chao2",
-        "jiu4 lian2 yi2 xiang4 yi3 yan2 jin3 chu1 ming2 de5 dou4 ban4 ping2 fen1 ye3 shi4 hen3 gao1 .",
-        "zao3 zai4 er4 ling2 yi1 wu3 nian2",
-        "ta1 de5 di4 yi1 ji4","di4 san1 ji2","jiu4 na2 dao4 le5 dou4 ban4 jiu2 dian3 er4 fen1",
-        "er2 rang4 ta1 yi2 xia4 na2 dao4 jiu2 dian3 wu3 fen1 de5 yuan2 yin1",
-	"shi4 yin1 wei2 ta1 zhan3 shi4 le5",
-	"zai4 na4 pian4 jue2 mei3 yu3 pin2 ji2 bing4 cun2 de5 jing4 tu3 shang4",
-        "pu3 tong1 ren2 de5 zhen1 shi2 sheng1 huo2 shi4 shen2 me5 yang4 zi5",
+        "A demarcação das novas fronteiras e a mudança dos povos aldeados não transcorreram sem dificuldades.",
+	"A inauguração da vila é quarta ou quinta-feira",
+        "Vote se você tiver o título de eleitor",
+        "Hoje é fundamental encontrar a razão da existência humana",
+        "A temperatura é mais amena à noite",
+        "Em muitas cidades a população está diminuindo.",
+        "Nunca se deve ficar em cima do morro",
+        "Para as pessoas estranhas o panorama é desolador",
+        "É bom te ver colhendo flores menino",
+        "Eu finjo me banhar num lago ao amanhecer",
+        "Sua sensibilidade mostrará o caminho",
+        "A Amazônia é a reserva ecológica do globo",
+        "O ministério mudou demais com a eleição",
+        "Novas metas surgem na informática",
+        "O capital de uma empresa depende de sua produção",
+        "Se não fosse ela tudo teria sido melhor",
+        "A principal personagem no filme é uma gueixa",
+        "Espere seu amigo em casa",
+        "A juventude tinha que revolucionar a escola",
+        " A cantora terá quatro meses para ensaiar seu canto",
+        "Esse tema foi falado no congresso."
 
 	# "guan1 yu2 xi1 zang4 de chuan2 shuo1 , you3 hen3 duo1 , li4 lai2 , dou1 shi4 chao2 sheng4 zhe3 de tian1 tang2 ,",
 	# "er2 zuo4 wei2 , zhong1 guo2 xi1 nan2 bian1 chui2 zhong4 di4 , ye3 dou1 shi4 zhong1 guo2 ling3 tu3 , bu4 ke3 fen1 ge1 de yi1 bu4 fen4 .",
