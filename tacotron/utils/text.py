@@ -37,7 +37,7 @@ def text_to_sequence(text, cleaner_names):
     text = m.group(3)
 
   # Append EOS token
-  sequence.append(_symbol_to_id['~'])
+  sequence.append(_symbol_to_id['-'])
   return sequence
 
 
