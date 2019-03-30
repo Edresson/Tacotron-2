@@ -17,9 +17,9 @@ hparams = tf.contrib.training.HParams(
 	num_lf0 = 1,
 	num_vuv = 1,
 	num_bap = 5, # 1(16KHz, 22050Hz), 5(44.1KHz, 48KHz)
-	frame_period = 15, #15ms
+	frame_period = 8, #15ms
 	sample_rate = 48000, #22050 Hz (corresponding to ljspeech dataset)
-	use_harvest = True, 
+	use_harvest = False, 
 	rescale_max = 0.999, #Rescaling value
 	trim_silence = True, #Whether to clip silence in Audio (at beginning and end of audio only, not the middle)
 	max_frame_num = 2000,  #Only relevant when clip_mels_length = True
