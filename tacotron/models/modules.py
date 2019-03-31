@@ -229,10 +229,12 @@ class CBHG:
 
 		self.highway_units = highway_units
 		self.highwaynet_layers = [HighwayNet(highway_units, name='{}_highwaynet_{}'.format(self.scope, i+1)) for i in range(n_highwaynet_layers)]
+		self._fw_cell = tf.nn.rnn_cell.BasicRNNCell(rnn_units, name='{}_forward_RNN'.format(self.scope))
+		self._bw_cell = tf.nn.rnn_cell.BasicRNNCell(rnn_units, name='{}_backward_RNN'.format(self.scope))
 		#self._fw_cell = tf.nn.rnn_cell.GRUCell(rnn_units, name='{}_forward_RNN'.format(self.scope))
 		#self._bw_cell = tf.nn.rnn_cell.GRUCell(rnn_units, name='{}_backward_RNN'.format(self.scope))
-		self._fw_cell = QRNN_layer(rnn_units, name='{}_forward_RNN'.format(self.scope), pool_type='fo')
-		self._bw_cell = QRNN_layer(rnn_units, name='{}_backward_RNN'.format(self.scope), pool_type='fo')
+		#self._fw_cell = QRNN_layer(rnn_units, name='{}_forward_RNN'.format(self.scope), pool_type='fo')
+                #self._bw_cell = QRNN_layer(rnn_units, name='{}_backward_RNN'.format(self.scope), pool_type='fo')
                 
 	def __call__(self, inputs, input_lengths):
 		with tf.variable_scope(self.scope):
