@@ -180,6 +180,7 @@ class EncoderConvolutions:
 			for i in range(self.enc_conv_num_layers):
 				x = conv1d(x, self.kernel_size, self.channels, self.activation,
 					self.is_training, self.drop_rate, self.bnorm, 'conv_layer_{}_'.format(i + 1)+self.scope)
+				
 		return x
 
 
@@ -395,7 +396,12 @@ def conv1d(inputs, kernel_size, channels, activation, is_training, drop_rate, bn
 			activation=activation if bnorm == 'after' else None,
 			padding='same')
 		batched = tf.layers.batch_normalization(conv1d_output, training=is_training)
-		activated = activation(batched) if bnorm == 'before' else batched
+		layernorm = tf.contrib.layers.layer_norm(batched,
+                                           begin_norm_axis=-1,
+                                           scope="normalize",
+                                           reuse=None)
+		activated = activation(layernorm) if bnorm == 'before' else batched
+		
 		return tf.layers.dropout(activated, rate=drop_rate, training=is_training,
 								name='dropout_{}'.format(scope))
 
