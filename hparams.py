@@ -142,11 +142,11 @@ hparams = tf.contrib.training.HParams(
 	tacotron_reg_weight = 1e-6, #regularization weight (for L2 regularization)
 	tacotron_scale_regularization = False, #Whether to rescale regularization weight to adapt for outputs range (used when reg_weight is high and biasing the model)
 	tacotron_zoneout_rate = 0.1, #zoneout rate for all LSTM cells in the network
-	tacotron_dropout_rate = 0.5, #dropout rate for all convolutional layers + prenet
+	tacotron_dropout_rate = 0.7, #dropout rate for all convolutional layers + prenet
 	tacotron_clip_gradients = True, #whether to clip gradients
 
 	#Evaluation parameters
-	tacotron_natural_eval = False, #Whether to use 100% natural eval (to evaluate Curriculum Learning performance) or with same teacher-forcing ratio as in training (just for overfit)
+	tacotron_natural_eval = True, #Whether to use 100% natural eval (to evaluate Curriculum Learning performance) or with same teacher-forcing ratio as in training (just for overfit)
 
 	#Decoder RNN learning can take be done in one of two ways:
 	#       Teacher Forcing: vanilla teacher forcing (usually with ratio = 1). mode='constant'
