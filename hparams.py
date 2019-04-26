@@ -141,8 +141,8 @@ hparams = tf.contrib.training.HParams(
 	#Regularization parameters
 	tacotron_reg_weight = 1e-6, #regularization weight (for L2 regularization)
 	tacotron_scale_regularization = False, #Whether to rescale regularization weight to adapt for outputs range (used when reg_weight is high and biasing the model)
-	tacotron_zoneout_rate = 0.5, #zoneout rate for all LSTM cells in the network
-	tacotron_dropout_rate = 0.7, #dropout rate for all convolutional layers + prenet
+	tacotron_zoneout_rate = 0.7, #zoneout rate for all LSTM cells in the network
+	tacotron_dropout_rate = 0.5, #dropout rate for all convolutional layers + prenet
 	tacotron_clip_gradients = True, #whether to clip gradients
 
 	#Evaluation parameters
