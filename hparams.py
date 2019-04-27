@@ -146,7 +146,7 @@ hparams = tf.contrib.training.HParams(
 	tacotron_clip_gradients = True, #whether to clip gradients
 
 	#Evaluation parameters
-	tacotron_natural_eval = True, #Whether to use 100% natural eval (to evaluate Curriculum Learning performance) or with same teacher-forcing ratio as in training (just for overfit)
+	tacotron_natural_eval = False, #Whether to use 100% natural eval (to evaluate Curriculum Learning performance) or with same teacher-forcing ratio as in training (just for overfit)
 
 	#Decoder RNN learning can take be done in one of two ways:
 	#       Teacher Forcing: vanilla teacher forcing (usually with ratio = 1). mode='constant'
